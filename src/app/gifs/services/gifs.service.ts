@@ -16,7 +16,9 @@ export class GifsService{
   private searchLimit: string = '10';
 
 
-  constructor(private http : HttpClient ){}
+  constructor(private http : HttpClient ){
+    this.loadLocalStorage();
+  }
 
   get tagsHistory(){
     return [...this._tagHistory];
@@ -29,6 +31,24 @@ export class GifsService{
     this._tagHistory.unshift(tag);
     this._tagHistory = this._tagHistory.splice(0,10);
 
+    this.saveLocalStorage();
+
+  }
+
+  private saveLocalStorage():void{
+    localStorage.setItem('history',JSON.stringify(this._tagHistory));
+  }
+
+  private loadLocalStorage():void{
+    if (!localStorage.getItem('history')) return;
+    const temporal = localStorage.getItem('history')
+    this._tagHistory = JSON.parse(temporal!);
+    this.firstSearch();
+
+  }
+
+  private firstSearch(){
+    this.searchTag(this._tagHistory.at(0)!);
   }
 
   searchTag(tag:string):void {
